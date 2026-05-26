@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Lookup App</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #74b9ff, #a29bfe);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .weather-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    input {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 8px;
+      width: 70%;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    button {
+      background-color: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #74b9ff;
+    }
+
+    .result {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .error {
+      color: #ffeaa7;
+      font-weight: bold;
+    }
+
+    .temp {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #dfe6e9;
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-container">
+    <h1>🌦️ Weather Lookup App</h1>
+    <p>Enter any city to see its current weather.</p>
+    <input type="text" id="cityInput" placeholder="Enter city name..." />
+    <br><br>
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <footer>Powered by OpenWeatherMap API</footer>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      if (!city) {
+        resultDiv.innerHTML = "<p class='error'>Please enter a city name.</p>";
+        return;
+      }
+
+      resultDiv.innerHTML = "<p>Loading...</p>";
+
+      const apiKey = "c086d0ddb0d7991ee1929050cb699643";
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("City not found");
+        }
+        const data = await response.json();
+
+        const temperature = data.main.temp;
+        const description = data.weather[0].description;
+        const icon = data.weather[0].icon;
+
+        resultDiv.innerHTML = `
+          <h2>${data.name}, ${data.sys.country}</h2>
+          <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather Icon" />
+          <p class="temp">${temperature}°C</p>
+          <p>${description.charAt(0).toUpperCase() + description.slice(1)}</p>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = "<p class='error'>City not found. Please try again.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
